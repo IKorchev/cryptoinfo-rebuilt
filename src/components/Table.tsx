@@ -3,21 +3,8 @@
 import { useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
 import type Data from '@/types/Data';
+import { formatBigNumber, formatCurrency, formatToFixed } from '@/utils/format';
 
-const COUNT_ABBRS = ['', 'k', 'm', 'b', 't', 'qd', 'qt', 'sx', 'sp'];
-
-function formatCount(count: number, decimals = 2) {
-  const i = 0 === count ? count : Math.floor(Math.log(count) / Math.log(1000));
-  let result = `${parseFloat((count / Math.pow(1000, i)).toFixed(decimals))}${COUNT_ABBRS[i]}`.trim();
-  return result;
-}
-
-function formatCurrency(stringOrNumber: string | number) {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-  }).format(Number(stringOrNumber));
-}
 function Table({ data }: { data: Data[] }) {
   const [socketData, setSocketData] = useState<{ [key: string]: string }>({});
   console.log(data);
@@ -68,16 +55,14 @@ function Table({ data }: { data: Data[] }) {
               const isNegative24hr = Number(el.changePercent24Hr) < 0;
               return (
                 <tr key={el.id} className='bg-gray-700 border-b transition duration-300 ease-in-out hover:bg-gray-800'>
-                  <td className='px-6 py-4 whitespace-nowrap '>{el.rank}</td>
-                  <td className='px-6 py-4 whitespace-nowrap'>{el.symbol}</td>
-                  <td className='px-6 py-4 whitespace-nowrap'>{el.name}</td>
-                  <td className='px-6 py-4 whitespace-nowrap'>{formatCurrency(el.priceUsd)}</td>
-                  <td className='px-6 py-4 whitespace-nowrap'>{formatCount(Number(el.supply))}</td>
-                  <td className='px-6 py-4 whitespace-nowrap'>{formatCount(Number(el.volumeUsd24Hr))}</td>
-                  <td className={`px-6 py-4 whitespace-nowrap ${isNegative24hr ? 'text-red-400' : 'text-emerald-400'}`}>
-                    {Number(el.changePercent24Hr).toFixed(2)}%
-                  </td>
-                  <td className='px-6 py-4 whitespace-nowrap'>
+                  <td className='px-6 py-4'>{el.rank}</td>
+                  <td className='px-6 py-4'>{el.symbol}</td>
+                  <td className='px-6 py-4'>{el.name}</td>
+                  <td className='px-6 py-4'>{formatCurrency(el.priceUsd)}</td>
+                  <td className='px-6 py-4'>{formatBigNumber(el.supply)}</td>
+                  <td className='px-6 py-4'>${formatBigNumber(el.volumeUsd24Hr)}</td>
+                  <td className={`px-6 py-4 ${isNegative24hr ? 'text-red-400' : 'text-emerald-400'}`}>{formatToFixed(el.changePercent24Hr, 2)}%</td>
+                  <td className='px-6 py-4'>
                     <a target='_blank' rel='noreferrer' href={el.explorer}>
                       Link
                     </a>
