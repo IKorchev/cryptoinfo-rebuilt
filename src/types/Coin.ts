@@ -1,4 +1,4 @@
-type Data = {
+type Coin = {
   id: string;
   rank: string;
   explorer: string;
@@ -13,4 +13,4 @@ type Data = {
   vwap24Hr: string;
 };
 
-export default Data;
+export default Coin;
